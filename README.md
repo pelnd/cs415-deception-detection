@@ -12,13 +12,28 @@ Download `train.jsonl`, `validation.jsonl`, `test.jsonl` from https://github.com
 
 ## Before you start
 
-- Use `scripts/data_loader.py` to load the data and the scoring script (step 2) to score, so everyone works from the same version.
-- The loader gives one row per message: game, split, sender, receiver, message order, text, lie label and score difference.
+- Use `scripts/data_loader.py` to load the data and `scripts/scoring.py` to score, so everyone works from the same version.
+- In the raw files the label means "truthful" (`true` = truthful, so a lie is `false`). The loader flips it, so `is_lie` = 1 means a lie. This way lie F1 and the models' "probability of class 1" both refer to lies, which is what we want to detect.
+- Quick check: `python scripts/data_loader.py` should print 13,132 / 1,416 / 2,741 messages.
+- Example:
+
+```python
+from data_loader import load_split
+from scoring import score
+
+train = load_split("train")   # a table, one row per message ("val" and "test" work the same)
+train["text"]                 # the message
+train["is_lie"]               # 1 = lie, 0 = truthful
+# other columns: game_id, sender, receiver, msg_index (order in the game),
+#                season, year, score, score_delta (sender's score minus receiver's)
+
+score(test["is_lie"], predictions)   # predictions: 0 or 1 for each message
+# -> {"macro_f1": ..., "lie_f1": ...}  on a 0-100 scale, like Peskov
+```
 - Each message has two labels: the sender's ("this is a lie") and the receiver's ("I think this is a lie"). We always predict the **sender's** label.
 - Tuning (settings, the cutoff for calling a message a lie) is done on the validation game or with leave-one-game-out. The test games are kept for the final results only, so they stay a fair comparison with Peskov.
 
 ## A rough idea of the steps
-
 
 **Setup**
 - [x] 1. Data loader for the official split, keeping sender, receiver, message order and score difference
