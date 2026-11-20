@@ -38,7 +38,7 @@ score(test["is_lie"], predictions)   # predictions: 0 or 1 for each message
 **Setup**
 - [x] 1. Data loader for the official split, keeping sender, receiver, message order and score difference
 - [x] 2. Scoring script: macro F1 + lie F1
-- [ ] 3. Table I stats + test-count check — needs 1
+- [x] 3. Table I stats + test-count check — needs 1
 
 **Baselines and sufficiency check**
 - [ ] 4. Majority + bag-of-words baselines, compared with Peskov — needs 1, 2
