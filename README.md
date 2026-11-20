@@ -19,7 +19,6 @@ Download `train.jsonl`, `validation.jsonl`, `test.jsonl` from https://github.com
 
 ## A rough idea of the steps
 
-`needs` = direct prerequisites only.
 
 **Setup**
 - [x] 1. Data loader for the official split, keeping sender, receiver, message order and score difference
