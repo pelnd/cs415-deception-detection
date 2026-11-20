@@ -4,7 +4,7 @@ Usage:
     from data_loader import load_split
     train = load_split("train")   # one row per message
 
-Run `python scripts/data_loader.py` to print per-split statistics.
+Run `python src/data_loader.py` to print per-split statistics.
 """
 import json
 from pathlib import Path

@@ -12,9 +12,9 @@ Download `train.jsonl`, `validation.jsonl`, `test.jsonl` from https://github.com
 
 ## Before you start
 
-- Use `scripts/data_loader.py` to load the data and `scripts/scoring.py` to score, so everyone works from the same version.
+- Use `src/data_loader.py` to load the data and `src/scoring.py` to score, so everyone works from the same version.
 - In the raw files the label means "truthful" (`true` = truthful, so a lie is `false`). The loader flips it, so `is_lie` = 1 means a lie. This way lie F1 and the models' "probability of class 1" both refer to lies, which is what we want to detect.
-- Quick check: `python scripts/data_loader.py` should print 13,132 / 1,416 / 2,741 messages.
+- Quick check: `python src/data_loader.py` should print 13,132 / 1,416 / 2,741 messages.
 - Example:
 
 ```python
