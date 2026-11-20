@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.ipynb_checkpoints/
+
+# Data and caches
+data/
+*.jsonl
+*.parquet
+*.pkl
+cache/
+
+# Models and training outputs
+checkpoints/
+outputs/
+runs/
+wandb/
+*.pt
+*.bin
+*.safetensors
+
+# Secrets
+.env
+
+# Editor / OS
+.vscode/
+.DS_Store
+Thumbs.db
