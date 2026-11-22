@@ -78,6 +78,7 @@ Optional: politeness features (needs 1), feeding into 12 and 16.
 | `src/test.ipynb` | steps 4–20 and 22, with results and conclusions |
 | `src/test/` | helper modules, one per part: `baselines.py` (4–5), `sentiment.py` (6, 8), `folds.py` (9), `tone.py` (10), `lr_models.py` (12), `finetune.py` (13–17), `results.py` (18–19), `figures.py` (20) |
 | `figures/` | report figures, PNG and PDF (step 20) |
+| `report/` | progress report in LaTeX (IEEE two-column): `main.tex`, `references.bib`, built `main.pdf`; build with `latexmk -pdf main.tex` from `report/` |
 | `cache/`, `outputs/` | sentiment scores and fine-tuning predictions (not committed) |
 
 ## Reproduce

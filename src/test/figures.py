@@ -65,7 +65,7 @@ def auc_chart(aucs, name="fig2_h1_auc"):
     ax.hlines(y, t.lo, t.hi, color=colors, lw=2)
     ax.scatter(t.auc, y, color=colors, s=30, zorder=3)
     ax.set_yticks(y, t.index)
-    ax.set_xlabel("AUC, lies vs truths (train + val); above 0.5 = lies score higher")
+    ax.set_xlabel("AUC, lies vs truths (train + val)\nabove 0.5 = lies score higher")
     ax.grid(axis="y", visible=False)
     ax.annotate("no difference", (0.5, len(t) - 0.4), xytext=(4, 0), textcoords="offset points", fontsize=7.5, color=INK2)
     fig.tight_layout()
