@@ -11,17 +11,29 @@
 \usepackage[table]{xcolor}
 \usepackage{url}
 \usepackage[hidelinks]{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc}
 
 % figures live in the repository's figures/ folder; a local copy in report/figures/ also works
 \graphicspath{{../figures/}{figures/}}
 
 \newcommand{\best}[1]{\textbf{#1}}
 
+% same colours as the figures in figures/
+\definecolor{cblue}{HTML}{2A78D6}
+\definecolor{corange}{HTML}{EB6834}
+\definecolor{caqua}{HTML}{1BAF7A}
+\definecolor{cgrey}{HTML}{9A9893}
+\definecolor{cink}{HTML}{52514E}
+
+\newcommand{\repourl}{https://github.com/pelnd/cs415-deception-detection}
+
 \begin{document}
 
 \title{Does Sentiment Help Catch a Liar?\\
 Sentiment and Tone-Change Features for Deception Detection in \textit{Diplomacy}\\
-{\large CS 415 Progress Report --- Group 7}}
+{\large CS 415 Progress Report --- Group 7}\\[2pt]
+{\normalsize GitHub: \href{\repourl}{\texttt{github.com/pelnd/cs415-deception-detection}}}}
 
 \author{
 \IEEEauthorblockN{Do\u{g}ukan Do\u{g}an}
@@ -70,7 +82,7 @@ Sentiment is a promising and so far unused signal for this task. Psychology sugg
 The proposal also set numerical success criteria for the full model: at least 57.2 macro F1 and 22.5 lie F1 (above Peskov et al.'s best macro F1 and the human lie F1) as a minimum, and 58.1 / 27.0 (above every number in~\cite{peskov2020takes}) as a target. We check these in Section~\ref{sec:res-hyp}.
 
 \subsection{Progress so far}
-All planned experiments are complete; the go / no-go decision (Section~\ref{sec:res-go}) and the final write-up remain\footnote{Code: \url{https://github.com/pelnd/cs415-deception-detection}}:
+All planned experiments are complete; the go / no-go decision (Section~\ref{sec:res-go}) and the final write-up remain. All code, notebooks and figures are in our repository (link on the title page):
 \begin{enumerate}
 \item A shared data loader and scorer, with the dataset statistics re-derived (Section~\ref{sec:data}).
 \item A reproduction of the baselines of Peskov et al.\ and a learning curve (Sections~\ref{sec:res-baselines}--\ref{sec:res-lc}).
@@ -121,6 +133,29 @@ Validation & 1  & 1{,}416  & 56  & 4.0 & 18.0 \\
 Test       & 2  & 2{,}741  & 240 & 8.8 & 19.5 \\
 \midrule
 Total      & 12 & 17{,}289 & 887 & 5.1 & 20.4 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:examples} shows four real messages, one for each combination of the two labels. Following Peskov et al., we call these \emph{straightforward} (a truth that is believed), \emph{deceived} (a lie that is believed), \emph{caught} (a lie that is suspected) and \emph{Cassandra} (a truth that is suspected). Lies and truths are hard to tell apart even for the receiver: the caught lie and the Cassandra truth below both blame a move on outdated orders.
+
+\begin{table}[t]
+\centering
+\caption{Example messages from the training games, with the sender's label (what we predict) and the receiver's guess.}
+\label{tab:examples}
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{>{\raggedright\arraybackslash}p{5.0cm}>{\centering\arraybackslash}p{1.0cm}>{\centering\arraybackslash}p{1.15cm}}
+\toprule
+Message (sender $\rightarrow$ receiver, season) & Sender & Receiver \\
+\midrule
+\textsc{Straightforward:} \textit{``I think I've made a reasonable case on why I have other stuff to worry about aside from attacking you!''} (Italy $\rightarrow$ Turkey, Winter 1901) & truth & truth \\
+\addlinespace
+\textsc{Deceived:} \textit{``Heads up: England is sniffing around. Wants to know if I'd be in to move to Piedmont if he takes the Channel.''} (Italy $\rightarrow$ France, Spring 1901) & \textbf{lie} & truth \\
+\addlinespace
+\textsc{Caught:} \textit{``I will absolutely pull out, it must have taken an older version of my orders before we agreed on not bouncing. Sorry about that.''} (Russia $\rightarrow$ Turkey, Fall 1901) & \textbf{lie} & \textbf{lie} \\
+\addlinespace
+\textsc{Cassandra:} \textit{``I'm sticking with the anti-Turkey plan -- the Galicia move was an initial move that I forgot to update.''} (Russia $\rightarrow$ Italy, Fall 1901) & truth & \textbf{lie} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -185,7 +220,52 @@ Beating the majority class is a low bar, so we also fit four further feature set
 
 \subsection{Fine-tuned RoBERTa models (H3, H4)}
 \label{sec:design-ft}
-\textbf{Architecture.} We fine-tune RoBERTa-base~\cite{liu2019roberta} end to end. The input is the message followed by its conversational context:
+\begin{figure*}[t]
+\centering
+\begin{tikzpicture}[
+  font=\footnotesize,
+  box/.style={draw=#1, fill=#1!9, rounded corners=2pt, line width=0.6pt, inner sep=4pt, align=center},
+  arr/.style={-{Latex[length=1.8mm]}, line width=0.6pt, draw=cink},
+  tag/.style={font=\scriptsize\bfseries, text=cink},
+]
+% text path
+\node[box=cblue, text width=3.9cm, align=left] (in) at (0,0)
+  {\textbf{Input} (max.\ 256 tokens)\\[1pt]
+   \texttt{<s>} \emph{message} \texttt{</s></s>}\\
+   Them: \ldots\\
+   Me: \ldots\\
+   \emph{(up to 5 earlier messages}\\
+   \emph{between the same two players)} \texttt{</s>}};
+\node[box=cblue, text width=2.1cm, minimum height=1.5cm] (rob) at (4.75,0) {\textbf{RoBERTa-base}\\fine-tuned\\end to end};
+\node[box=cblue, text width=1.55cm, minimum height=1.5cm] (h) at (7.35,0) {$\mathbf{h}$\\\texttt{<s>} vector\\768-d};
+% feature path
+\node[box=cgrey, text width=3.9cm, align=left] (pow) at (0,-2.35) {\textbf{Power} (2): sender $>4$ centres ahead / behind};
+\node[box=corange, text width=3.9cm, align=left, below=1.5mm of pow] (sent) {\textbf{Sentiment} (8): VADER $\times 4$, Twitter-RoBERTa $\times 4$};
+\node[box=caqua, text width=3.9cm, align=left, below=1.5mm of sent] (tone) {\textbf{Tone change} (13): vs.\ the sender's earlier messages};
+\node[tag, anchor=west] at ($(pow.east)+(0.05,0)$) {(c)(d)(e)};
+\node[tag, anchor=west] at ($(sent.east)+(0.05,0)$) {(d)(e)};
+\node[tag, anchor=west] at ($(tone.east)+(0.05,0)$) {(e)};
+\node[box=cgrey, text width=2.1cm] (std) at (rob |- sent) {standardise\\(fit on train)\\$\tilde{\mathbf{f}}$};
+% head
+\node[box=cink, text width=1.75cm] (cat) at (9.9,-1.55) {concatenate\\$[\mathbf{h};\tilde{\mathbf{f}}]$\\dropout 0.1};
+\node[box=cink, text width=1.6cm] (lin) at (12.2,-1.55) {linear layer\\+ softmax\\$P(\text{lie})$};
+\node[box=cink, text width=1.95cm] (dec) at (14.65,-1.55) {cutoff chosen\\on validation\\$\Rightarrow$ \textbf{lie} / \textbf{truth}};
+% arrows
+\draw[arr] (in) -- (rob);
+\draw[arr] (rob) -- (h);
+\draw[arr] (h.east) -| ($(cat.north)+(-0.3,0)$);
+\draw[arr] (std.east) -| ($(cat.south)+(-0.3,0)$);
+\draw[arr] ($(pow.east)+(1.05,0)$) -- ++(0.25,0) |- ($(std.west)+(0,0.25)$);
+\draw[arr] ($(sent.east)+(0.75,0)$) -- (std.west);
+\draw[arr] ($(tone.east)+(0.45,0)$) -- ++(0.55,0) |- ($(std.west)+(0,-0.25)$);
+\draw[arr] (cat) -- (lin);
+\draw[arr] (lin) -- (dec);
+\end{tikzpicture}
+\caption{Overview of the fine-tuned models. The message and its conversational context are encoded by RoBERTa; the \texttt{<s>} vector is joined with standardised extra features and classified by a linear layer. Models (c), (d) and (e) share the same encoder and differ only in the feature groups they use (tags on the right of each group). Training uses all lies and a fresh sample of three times as many truths in every epoch, with a class-weighted loss.}
+\label{fig:arch}
+\end{figure*}
+
+\textbf{Architecture.} We fine-tune RoBERTa-base~\cite{liu2019roberta} end to end; Fig.~\ref{fig:arch} gives an overview. The input is the message followed by its conversational context:
 \[
 \texttt{<s>}\ \text{message}\ \texttt{</s></s>}\ \text{context}\ \texttt{</s>}
 \]
@@ -592,6 +672,32 @@ So far, then, the answer to our research question is \emph{largely negative}: on
 \item \textbf{Politeness features} (optional in our plan). Politeness strategies~\cite{danescu2013politeness} were another harbinger of betrayal, and would test whether a social signal other than sentiment helps where sentiment did not.
 \item \textbf{Final report.} Write up the final results with the figures and tables of this report, including a qualitative analysis of the examples and a discussion of the negative result.
 \end{enumerate}
+
+Table~\ref{tab:plan} turns these steps into a schedule. Owners follow the division of work in our proposal: data analysis and baselines (Do\u{g}an), sentiment and tone-change features and the sentiment-only classifier (Durukan), and fine-tuning, seeds and error analysis (Eken).
+
+\begin{table}[t]
+\centering
+\caption{Plan for the remaining work, in weeks after this report. Step numbers refer to the list above.}
+\label{tab:plan}
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{c>{\raggedright\arraybackslash}p{4.6cm}>{\raggedright\arraybackslash}p{1.75cm}}
+\toprule
+Week & Task (step) & Owner \\
+\midrule
+1 & Go / no-go decision (1) & All \\
+1 & Length-controlled evaluation: results within length bins and on a length-matched subsample (2) & Do\u{g}an \\
+\midrule
+2 & Length feature in the fine-tuned models; cutoff from out-of-game ensemble predictions (2, 3) & Eken \\
+2 & Receiver-relative tone-change features (4) & Durukan \\
+\midrule
+3 & Politeness features, if time allows (5); final runs of the chosen models & Durukan, Eken \\
+3 & Updated results tables and figures & Do\u{g}an \\
+\midrule
+4 & Final report (6) & All \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 % =====================================================================
 \bibliographystyle{IEEEtran}
