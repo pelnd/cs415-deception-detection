@@ -26,7 +26,6 @@ wandb/
 
 # Secrets
 .env
-report/
 
 # Editor / OS
 .vscode/
