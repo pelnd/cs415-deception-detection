@@ -12,6 +12,8 @@ data/
 *.parquet
 *.pkl
 cache/
+2020_acl_diplomacy-master/
+2020.acl-main.353.pdf
 
 # Models and training outputs
 checkpoints/
@@ -29,3 +31,4 @@ wandb/
 .vscode/
 .DS_Store
 Thumbs.db
+desktop.ini
