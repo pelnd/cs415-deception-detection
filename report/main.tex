@@ -224,7 +224,7 @@ The bootstrap treats messages as independent, although they come from only two g
 
 \subsection{Baseline reproduction}
 \label{sec:res-baselines}
-Table~\ref{tab:baselines} compares our baselines with Peskov et al. All three are within 0.3 macro F1 and 0.6 lie F1 of the published numbers. The small remaining gap is probably due to library versions (spaCy, scikit-learn). Our recomputed human baseline is 58.1 / 22.6 against their 58.1 / 22.5. The words with the largest bag-of-words coefficients agree with the qualitative analysis of the original paper: ``alternatives'', ``intent'' and ``inconclusive'' point to lies, while casual address (``dude'', ``man'') and ``fine'' point to truth.
+Table~\ref{tab:baselines} compares our baselines with Peskov et al. All three are within 0.3 macro F1 and 0.6 lie F1 of the published numbers. The small remaining gap is probably due to library versions (spaCy, scikit-learn). Recomputing the human baseline from the receivers' labels reproduces their 58.1 / 22.5 (the unrounded lie F1 is $84/372 = 22.58$; we use their published 22.5 throughout). The words with the largest bag-of-words coefficients agree with the qualitative analysis of the original paper: ``alternatives'', ``intent'' and ``inconclusive'' point to lies, while casual address (``dude'', ``man'') and ``fine'' point to truth.
 
 \begin{table}[t]
 \centering
@@ -237,7 +237,7 @@ Model & Peskov et al. & Ours \\
 Majority (always truth)  & 47.8 / \phantom{0}0.0 & 47.7 / \phantom{0}0.0 \\
 Bag of words             & 54.3 / 19.1 & 54.0 / 18.5 \\
 Bag of words + power     & 54.9 / 20.2 & 54.7 / 19.8 \\
-Human receivers          & 58.1 / 22.5 & 58.1 / 22.6 \\
+Human receivers          & 58.1 / 22.5 & 58.1 / 22.5 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -432,7 +432,7 @@ Group & Model & Macro F1 & 95\% CI & Lie F1 & 95\% CI \\
 \multirow{3}{*}{Our baselines}
  & Majority                      & 47.7 & & \phantom{0}0.0 & \\
  & Bag of words + power          & 54.7 & & 19.8 & \\
- & Human receivers (recomputed)  & 58.1 & & 22.6 & \\
+ & Human receivers (recomputed)  & 58.1 & & 22.5 & \\
 \midrule
 \multirow{4}{*}{Logistic regression}
  & L: length only                & 55.8 & & 17.4 & \\
