@@ -70,7 +70,7 @@ Sentiment is a promising and so far unused signal for this task. Psychology sugg
 The proposal also set numerical success criteria for the full model: at least 57.2 macro F1 and 22.5 lie F1 (above Peskov et al.'s best macro F1 and the human lie F1) as a minimum, and 58.1 / 27.0 (above every number in~\cite{peskov2020takes}) as a target. We check these in Section~\ref{sec:res-hyp}.
 
 \subsection{Progress so far}
-All planned experiments except the final write-up are complete\footnote{Code: \url{https://github.com/pelnd/cs415-deception-detection}}:
+All planned experiments are complete; the go / no-go decision (Section~\ref{sec:res-go}) and the final write-up remain\footnote{Code: \url{https://github.com/pelnd/cs415-deception-detection}}:
 \begin{enumerate}
 \item A shared data loader and scorer, with the dataset statistics re-derived (Section~\ref{sec:data}).
 \item A reproduction of the baselines of Peskov et al.\ and a learning curve (Sections~\ref{sec:res-baselines}--\ref{sec:res-lc}).
@@ -305,15 +305,15 @@ The tone-change features, tested in the same way, show even smaller differences.
 \label{fig:bins}
 \end{figure}
 
-\subsection{Go / no-go decision}
+\subsection{Go / no-go checkpoint (decision pending)}
 \label{sec:res-go}
-The plan included a checkpoint after the first experiments. The evidence showed that:
+The plan included a checkpoint after the first experiments: if the sentiment signal proved too weak, the proposal's fallback was to narrow the project to a statistical analysis of sentiment in lies. The evidence so far shows that:
 \begin{itemize}
 \item the pipeline is sound, since the baselines are reproduced;
 \item the task is limited by the signal, not by the amount of data;
 \item the sentiment signal exists but is weak and tied up with length.
 \end{itemize}
-The proposal's fallback, if the signal proved too weak, was to narrow the project to a statistical analysis of sentiment in lies. Because H1 was significant and the learning curve showed the data to be sufficient for simple models, we decided to continue with the classifiers, with two changes. First, sentiment is treated as a weak, complementary signal, and a clean negative result is an acceptable outcome. Second, every sentiment model is compared against a length control, so that a gain from sentiment is not really a gain from length.
+The team has \emph{not yet taken} the go / no-go decision. To give that decision the fullest possible evidence, we ran the remaining experiments (Sections~\ref{sec:res-lr}--\ref{sec:res-err}) in the meantime, under two working assumptions. First, sentiment is treated as a weak, complementary signal, and a clean negative result is an acceptable outcome. Second, every sentiment model is compared against a length control, so that a gain from sentiment is not really a gain from length. The decision will be taken on the basis of the results in this report (Section~\ref{sec:conclusion}).
 
 \subsection{H2: a classifier on sentiment and tone change only}
 \label{sec:res-lr}
@@ -585,6 +585,7 @@ So far, then, the answer to our research question is \emph{largely negative}: on
 
 \subsection{Steps to be taken from now on}
 \begin{enumerate}
+\item \textbf{Go / no-go decision.} Decide, on the basis of the results above, whether to continue with the classifiers, as in the steps below, or to narrow the final report to a statistical analysis of sentiment in lies, the fallback named in our proposal.
 \item \textbf{Remove the length confound from the evaluation.} Add message length explicitly to the fine-tuned models' feature vector, so that (c)--(e) all share the same length control as the logistic regressions. Also report results within length bins and on a length-matched subsample of lies and truths.
 \item \textbf{More robust model selection.} Choose the cutoff (and possibly the epoch) from out-of-game predictions of the seed ensemble rather than from the single validation game. If compute allows, run a reduced LOGO for the best model, to test whether the H3 and H4 conclusions hold across games and not only on the two test games.
 \item \textbf{Relative and two-sided tone change.} Our tone-change features compare a sender only with themselves. Niculae et al.\ found that betrayal is foreshadowed by \emph{imbalances} between partners~\cite{niculae2015harbingers}, so we will add features that compare the sender's tone with the receiver's recent tone.
