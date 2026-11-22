@@ -1,0 +1,3 @@
+model,macro_f1,lie_f1,lie_prec,lie_rec
+Majority class (predict truth),47.710797405570396,0.0,0.0,0.0
+"BoW + LogReg (C=0.01, lie weight=20, tuned on val lie F1)",55.77061918089334,23.401360544217688,17.373737373737374,35.833333333333336
